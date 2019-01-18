@@ -26,47 +26,51 @@ namespace mandc_Assign1
                 {
                     tokens = line.Split('\t');
 
-                    Item myItem = new Item(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]), 
+                    Item myItem = new Item(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]),
                        Convert.ToUInt32(tokens[3]), Convert.ToUInt32(tokens[4]), Convert.ToUInt32(tokens[5]),
                        Convert.ToUInt32(tokens[6]), tokens[7]);
 
                     itemDictionary.Add(Convert.ToUInt32(tokens[0]), myItem);
 
                     line = inFile.ReadLine();
-                 
-                }
 
+                }
+               
             }
+       
 
             using (StreamReader inFile = new StreamReader("..\\..\\players.txt"))
-            {
+            { 
                 line = inFile.ReadLine();
 
                 Dictionary<uint, Player> playerDictionary = new Dictionary<uint, Player>();
 
                 while (line != null)
                 {
-                    tokens = line.Split('\t');
+                    tokens = line.Split();
 
                     for (int i = 0; i < tokens.Length; i++)
                         System.Console.WriteLine("{0}", tokens[i]);
 
-                   // Player myPlayer = new Item(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]),
-                    //   Convert.ToUInt32(tokens[3]), Convert.ToUInt32(tokens[4]), Convert.ToUInt32(tokens[5]),
-                     //  Convert.ToUInt32(tokens[6]), tokens[7]);
+                   Player myPlayer = new Player(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]), Convert.ToUInt32(tokens[3]), Convert.ToUInt32(tokens[4]), 
+                      Convert.ToUInt32(tokens[5]),Convert.ToUInt32(tokens[6]), Convert.ToUInt32(tokens[7]), Convert.ToUInt32(tokens[8]), Convert.ToUInt32(tokens[9]),
+                      Convert.ToUInt32(tokens[10]), Convert.ToUInt32(tokens[11]), Convert.ToUInt32(tokens[12]), Convert.ToUInt32(tokens[13]),
+                      Convert.ToUInt32(tokens[14]), Convert.ToUInt32(tokens[15]), Convert.ToUInt32(tokens[16]), Convert.ToUInt32(tokens[17]),
+                      Convert.ToUInt32(tokens[18]), Convert.ToUInt32(tokens[19]));
 
-                  // playerDictionary.Add(Convert.ToUInt32(tokens[0]), myPlayer);
-
+                    playerDictionary.Add(Convert.ToUInt32(tokens[0]), myPlayer);
+                    
                     line = inFile.ReadLine();
 
                 }
-                //foreach (KeyValuePair<uint, Item> obj in myDictionary)
-                //{
-                   // Console.WriteLine("Key: {0} ", obj.Key);
-                //}
-
+                    foreach (KeyValuePair<uint, Player> obj in playerDictionary)
+                    {
+                     Console.WriteLine("Key: {0} ", obj.Key);
+                    }
+                
             }
-
+        
+            #region
             System.Console.WriteLine("Welcome to the World of ConflictCraft: Testing Environment!\n\n");
             System.Console.WriteLine("Welcome to World of ConflictCraft: Testing Environment. Please select an option from the list below: ");
             System.Console.WriteLine("\t1.) Print All Players");
@@ -79,7 +83,7 @@ namespace mandc_Assign1
             System.Console.WriteLine("\t8.) Unequip Gear");
             System.Console.WriteLine("\t9.) Award Experience");
             System.Console.WriteLine("\t10.) Quit");
-
+            #endregion
         }
     }
 
@@ -92,10 +96,10 @@ namespace mandc_Assign1
             Ring, Trinket
         };
 
-        private static uint MAX_LEVEL = 60;
-        private static uint MAX_ILLVL = 360;
-        private static uint MAX_PRIMARY = 200;
-        private static uint MAX_STAMINA = 275;
+       private static uint MAX_LEVEL = 60;
+       static uint MAX_ILLVL = 360;
+       private static uint MAX_PRIMARY = 200;
+       private static uint MAX_STAMINA = 275;
 
 
         private readonly uint id;
@@ -219,6 +223,7 @@ namespace mandc_Assign1
             if (obj == null) return 1;
 
             Item rightObj = obj as Item;
+
             if (rightObj != null)
                 return name.CompareTo(rightObj.name);
             else
@@ -243,7 +248,7 @@ namespace mandc_Assign1
         uint level;
         uint exp;
         uint guildID;
-        uint[] gear;
+        uint[] gear = new uint[14];
         List<uint> inventory;
 
         public uint Id //this is my public property
@@ -306,7 +311,7 @@ namespace mandc_Assign1
             }
         } //function determines how a player levels up
 
-        public Player(uint id, string name, uint race, uint level, uint exp, uint guildID, uint[] gear, List<uint> inventory)
+        public Player(uint id, string name, uint race, uint level, uint exp, uint guildID, params uint[] gear)
         {
             this.id = id;
             this.name = name;
@@ -314,8 +319,8 @@ namespace mandc_Assign1
             this.level = level;
             this.exp = exp;
             this.guildID = guildID;
-            this.gear = gear;         
-            this.inventory = inventory;
+            for (int i = 0; i < gear.Length; i++)
+                this.gear[i] = gear[i];
         }
 
         public Player()
@@ -327,7 +332,7 @@ namespace mandc_Assign1
             this.exp = 0;
             this.guildID = 0;
             
-            for (uint i = 0; i < GEAR_SLOTS; i++) //possibly GEAR_SLOTS?
+            for (uint i = 0; i < GEAR_SLOTS; i++) 
                 this.gear[i] = 0;
 
             this.inventory = null;
@@ -341,7 +346,7 @@ namespace mandc_Assign1
             if (rightObj != null)
                 return name.CompareTo(rightObj.name);
             else
-                throw new ArgumentException("[Player]:CompareTo argument is not an Item");
+                throw new ArgumentException("[Player]:CompareTo argument is not a Player");
         }
 
         public void EquipGear(uint newGearID)
