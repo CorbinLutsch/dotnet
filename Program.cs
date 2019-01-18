@@ -20,27 +20,52 @@ namespace mandc_Assign1
             {
                 line = inFile.ReadLine();
 
+                Dictionary<uint, Item> itemDictionary = new Dictionary<uint, Item>();
+
                 while (line != null)
                 {
-                   
-                    Dictionary<uint, Item> myDictionary;
+                    tokens = line.Split('\t');
 
+                    Item myItem = new Item(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]), 
+                       Convert.ToUInt32(tokens[3]), Convert.ToUInt32(tokens[4]), Convert.ToUInt32(tokens[5]),
+                       Convert.ToUInt32(tokens[6]), tokens[7]);
+
+                    itemDictionary.Add(Convert.ToUInt32(tokens[0]), myItem);
+
+                    line = inFile.ReadLine();
+                 
+                }
+
+            }
+
+            using (StreamReader inFile = new StreamReader("..\\..\\players.txt"))
+            {
+                line = inFile.ReadLine();
+
+                Dictionary<uint, Player> playerDictionary = new Dictionary<uint, Player>();
+
+                while (line != null)
+                {
                     tokens = line.Split('\t');
 
                     for (int i = 0; i < tokens.Length; i++)
                         System.Console.WriteLine("{0}", tokens[i]);
 
-                    Item myItem = new Item(Convert.ToUInt32(tokens[0]), tokens[1], Convert.(ItemType, tokens[2]), tokens[3], tokens[4], tokens[5], tokens[6], tokens[7]);
+                   // Player myPlayer = new Item(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]),
+                    //   Convert.ToUInt32(tokens[3]), Convert.ToUInt32(tokens[4]), Convert.ToUInt32(tokens[5]),
+                     //  Convert.ToUInt32(tokens[6]), tokens[7]);
 
-                    myDictionary.Add(tokens[0], myItem);
-
+                  // playerDictionary.Add(Convert.ToUInt32(tokens[0]), myPlayer);
 
                     line = inFile.ReadLine();
+
                 }
+                //foreach (KeyValuePair<uint, Item> obj in myDictionary)
+                //{
+                   // Console.WriteLine("Key: {0} ", obj.Key);
+                //}
 
-              
             }
-
 
             System.Console.WriteLine("Welcome to the World of ConflictCraft: Testing Environment!\n\n");
             System.Console.WriteLine("Welcome to World of ConflictCraft: Testing Environment. Please select an option from the list below: ");
@@ -181,7 +206,7 @@ namespace mandc_Assign1
         {
             id = i;
             name = n;
-            type = ty;
+            type = (ItemType)ty;
             ilvl = ilv;
             primary = prim;
             stamina = stam;
@@ -281,11 +306,11 @@ namespace mandc_Assign1
             }
         } //function determines how a player levels up
 
-        public Player(uint id, string name, Race race, uint level, uint exp, uint guildID, uint[] gear, List<uint> inventory)
+        public Player(uint id, string name, uint race, uint level, uint exp, uint guildID, uint[] gear, List<uint> inventory)
         {
             this.id = id;
             this.name = name;
-            this.race = race;
+            this.race = (Race)race;
             this.level = level;
             this.exp = exp;
             this.guildID = guildID;
