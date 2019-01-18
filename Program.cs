@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO; //for stream reader
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,49 @@ namespace mandc_Assign1
     {
         static void Main(string[] args)
         {
+            string line;
+            string[] tokens;
+
+            //read the input files
+            using (StreamReader inFile = new StreamReader("..\\..\\items.txt"))
+            {
+                line = inFile.ReadLine();
+
+                while (line != null)
+                {
+                   
+                    Dictionary<uint, Item> myDictionary;
+
+                    tokens = line.Split('\t');
+
+                    for (int i = 0; i < tokens.Length; i++)
+                        System.Console.WriteLine("{0}", tokens[i]);
+
+                    Item myItem = new Item(Convert.ToUInt32(tokens[0]), tokens[1], Convert.(ItemType, tokens[2]), tokens[3], tokens[4], tokens[5], tokens[6], tokens[7]);
+
+                    myDictionary.Add(tokens[0], myItem);
+
+
+                    line = inFile.ReadLine();
+                }
+
+              
+            }
+
+
+            System.Console.WriteLine("Welcome to the World of ConflictCraft: Testing Environment!\n\n");
+            System.Console.WriteLine("Welcome to World of ConflictCraft: Testing Environment. Please select an option from the list below: ");
+            System.Console.WriteLine("\t1.) Print All Players");
+            System.Console.WriteLine("\t2.) Print All Guilds");
+            System.Console.WriteLine("\t3.) Print All Gear");
+            System.Console.WriteLine("\t4.) Print Gear List for Player");
+            System.Console.WriteLine("\t5.) Leave Guild");
+            System.Console.WriteLine("\t6.) Join Guild");
+            System.Console.WriteLine("\t7.) Equip Gear");
+            System.Console.WriteLine("\t8.) Unequip Gear");
+            System.Console.WriteLine("\t9.) Award Experience");
+            System.Console.WriteLine("\t10.) Quit");
+
         }
     }
 
@@ -55,7 +99,7 @@ namespace mandc_Assign1
 
             set
             {
-                if ((int)value >= 0 && (int)value <= 12)
+                if ((int)value >= 0 && (int)value <= 11)
                     type = value;
                 else
                     type = 0;
@@ -132,8 +176,8 @@ namespace mandc_Assign1
         }
 
         //default constructor #2
-        public Item(uint i, string n, ItemType ty, uint ilv, uint prim, uint stam,
-        uint req, string flav)
+        public Item(uint i, string n, uint ty, uint ilv, uint prim, uint stam,
+        uint req, string flav) //ItemType ty?
         {
             id = i;
             name = n;
@@ -159,7 +203,7 @@ namespace mandc_Assign1
         //provide an override to ToString() method
     }
 
-    public class Player : Item, IComparable
+    public class Player : IComparable
     {
 
         public enum Race { Orc, Troll, Tauren, Forsaken };
@@ -177,12 +221,12 @@ namespace mandc_Assign1
         uint[] gear;
         List<uint> inventory;
 
-        public uint Id2 //this is my public property
+        public uint Id //this is my public property
         {
             get { return id; }
         }
 
-        public string Name2 //this is my public property
+        public string Name //this is my public property
         {
             get { return name; }
         }
@@ -222,7 +266,7 @@ namespace mandc_Assign1
             set { guildID = value; }
         }
 
-        public uint this[uint index] //this is a public indexer for gear
+        public uint this[int index] //this is a public indexer for gear
         {
             get { return gear[index]; }
             set { gear[index] = value; }
@@ -245,8 +289,7 @@ namespace mandc_Assign1
             this.level = level;
             this.exp = exp;
             this.guildID = guildID;
-            for (uint i = 0; i < gear.Length; i++)
-                this.gear[i] = gear[i];
+            this.gear = gear;         
             this.inventory = inventory;
         }
 
@@ -258,7 +301,10 @@ namespace mandc_Assign1
             this.level = 0;
             this.exp = 0;
             this.guildID = 0;
-            this.gear = null; 
+            
+            for (uint i = 0; i < GEAR_SLOTS; i++) //possibly GEAR_SLOTS?
+                this.gear[i] = 0;
+
             this.inventory = null;
         }
 
@@ -276,10 +322,20 @@ namespace mandc_Assign1
         public void EquipGear(uint newGearID)
         {
             //is it a valid piece of gear?
-            if (Item.id == newGearId)
-            
+            //is newGearID an item id?
+
+            //&& does the player's level match the item requirement?       
 
         }
+
+        public void UnequipGear(int gearSlot)
+        {
+            if (gear[gearSlot] != 0)
+            {
+
+            }
+        }
+
     }
 
     
