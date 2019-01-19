@@ -33,12 +33,9 @@ namespace mandc_Assign1
                     itemDictionary.Add(Convert.ToUInt32(tokens[0]), myItem);
 
                     line = inFile.ReadLine();
-
-                }
-               
+                }      
             }
        
-
             using (StreamReader inFile = new StreamReader("..\\..\\players.txt"))
             { 
                 line = inFile.ReadLine();
@@ -49,9 +46,6 @@ namespace mandc_Assign1
                 {
                     tokens = line.Split();
 
-                    for (int i = 0; i < tokens.Length; i++)
-                        System.Console.WriteLine("{0}", tokens[i]);
-
                    Player myPlayer = new Player(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]), Convert.ToUInt32(tokens[3]), Convert.ToUInt32(tokens[4]), 
                       Convert.ToUInt32(tokens[5]),Convert.ToUInt32(tokens[6]), Convert.ToUInt32(tokens[7]), Convert.ToUInt32(tokens[8]), Convert.ToUInt32(tokens[9]),
                       Convert.ToUInt32(tokens[10]), Convert.ToUInt32(tokens[11]), Convert.ToUInt32(tokens[12]), Convert.ToUInt32(tokens[13]),
@@ -59,18 +53,40 @@ namespace mandc_Assign1
                       Convert.ToUInt32(tokens[18]), Convert.ToUInt32(tokens[19]));
 
                     playerDictionary.Add(Convert.ToUInt32(tokens[0]), myPlayer);
-                    
-                    line = inFile.ReadLine();
 
-                }
-                    foreach (KeyValuePair<uint, Player> obj in playerDictionary)
-                    {
-                     Console.WriteLine("Key: {0} ", obj.Key);
-                    }
-                
+                    line = inFile.ReadLine();
+                }         
             }
-        
-            #region
+
+            using (StreamReader inFile = new StreamReader("..\\..\\guilds.txt"))
+            {
+                line = inFile.ReadLine();
+       
+                Dictionary<uint, string> guildDictionary = new Dictionary<uint, string>();
+
+                while (line != null)
+                {
+                    tokens = line.Split();
+                    guildDictionary.Add(Convert.ToUInt32(tokens[0]), tokens[1]);           
+                    line = inFile.ReadLine();
+                }
+            }
+
+            Menu myMenu = new Menu();
+            myMenu.PrintMenu();
+            myMenu.GetOption();
+            
+        }
+    }
+
+    public class Menu 
+    {
+        //default constructor for menu class
+        public Menu()
+        { }
+
+        public void PrintMenu()
+        {
             System.Console.WriteLine("Welcome to the World of ConflictCraft: Testing Environment!\n\n");
             System.Console.WriteLine("Welcome to World of ConflictCraft: Testing Environment. Please select an option from the list below: ");
             System.Console.WriteLine("\t1.) Print All Players");
@@ -83,11 +99,20 @@ namespace mandc_Assign1
             System.Console.WriteLine("\t8.) Unequip Gear");
             System.Console.WriteLine("\t9.) Award Experience");
             System.Console.WriteLine("\t10.) Quit");
-            #endregion
+        }
+
+        public void GetOption()
+        {
+            string line = null;
+
+            while (line != "10" && line != "q" && line != "Q" && line != "quit" && line != "Quit" && line != "exit" && line != "Exit")
+            {
+                line = Console.ReadLine();
+            }
         }
     }
 
-    public class Item : IComparable
+    public class Item : Menu, IComparable
     {
         public enum ItemType
         {
@@ -233,7 +258,7 @@ namespace mandc_Assign1
         //provide an override to ToString() method
     }
 
-    public class Player : IComparable
+    public class Player : Menu, IComparable
     {
 
         public enum Race { Orc, Troll, Tauren, Forsaken };
