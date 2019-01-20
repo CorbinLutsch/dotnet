@@ -12,7 +12,7 @@ namespace mandc_Assign1
     {
         static void Main(string[] args)
         {
-            
+            Console.WriteLine("Welcome to the World of ConflictCraft: Testing Environment!\n");
             Menu myMenu = new Menu();
             myMenu.PrintMenu();
             myMenu.GetOptions();
@@ -91,47 +91,89 @@ namespace mandc_Assign1
 
         public void PrintMenu()
         {
-            System.Console.WriteLine("Welcome to the World of ConflictCraft: Testing Environment!\n\n");
-            System.Console.WriteLine("Welcome to World of ConflictCraft: Testing Environment. Please select an option from the list below: ");
-            System.Console.WriteLine("\t1.) Print All Players");
-            System.Console.WriteLine("\t2.) Print All Guilds");
-            System.Console.WriteLine("\t3.) Print All Gear");
-            System.Console.WriteLine("\t4.) Print Gear List for Player");
-            System.Console.WriteLine("\t5.) Leave Guild");
-            System.Console.WriteLine("\t6.) Join Guild");
-            System.Console.WriteLine("\t7.) Equip Gear");
-            System.Console.WriteLine("\t8.) Unequip Gear");
-            System.Console.WriteLine("\t9.) Award Experience");
-            System.Console.WriteLine("\t10.) Quit");
+            Console.WriteLine("\nWelcome to World of ConflictCraft: Testing Environment. Please select an option from the list below: ");
+            Console.WriteLine("\t1.) Print All Players");
+            Console.WriteLine("\t2.) Print All Guilds");
+            Console.WriteLine("\t3.) Print All Gear");
+            Console.WriteLine("\t4.) Print Gear List for Player");
+            Console.WriteLine("\t5.) Leave Guild");
+            Console.WriteLine("\t6.) Join Guild");
+            Console.WriteLine("\t7.) Equip Gear");
+            Console.WriteLine("\t8.) Unequip Gear");
+            Console.WriteLine("\t9.) Award Experience");
+            Console.WriteLine("\t10.) Quit");
         }
 
         public void GetOptions()
         {
             line = null;
 
+            line = Console.ReadLine();
+
             while (line != "10" && line != "q" && line != "Q" && line != "quit" && line != "Quit" && line != "exit" && line != "Exit")
             {
-                line = Console.ReadLine();
-
                 switch (line)
                 {
-                    case "1":
+                    case "1": //Print All Players
                         foreach (KeyValuePair<uint, Player> obj in playerDictionary)
                         {
                             //Write the override ToString player object 
                             Console.Write(obj.Value);
 
-                            string gname = null;
-                            //find the corresponding guild name
-                            guildDictionary.TryGetValue(obj.Value.GuildId, out gname);
-                            Console.WriteLine(gname);
+                            GetGuild(obj.Value);
+                        }
+                        break;
+
+                    case "2": //Print All Guilds
+                        foreach (KeyValuePair<uint, string> obj in guildDictionary)
+                        {
+                            Console.WriteLine(obj.Value);
+                        }
+                        break;
+
+                    case "3": //Print All Gear
+                        foreach (KeyValuePair<uint, Item> obj in itemDictionary)
+                        {
+                            Console.Write(obj.Value);
+                        }
+                        break;
+
+                    case "4": //print gear for a specific player 
+                        Console.Write("Enter the player name: ");
+                        line = Console.ReadLine();
+                        //LINQ query to find the associated key for the player name
+                        var findKey = from K in playerDictionary where K.Value.Name == line select K.Key;
+                        Player foundPlayer;
+                        Item foundItem;
+
+                        foreach (uint key in findKey)
+                        {
+                            playerDictionary.TryGetValue(key, out foundPlayer);
+                            Console.Write(foundPlayer);                           
+                            GetGuild(foundPlayer);
+
+                            for (int i = 0; i < foundPlayer.gear.Length; i++)
+                            {                
+                                itemDictionary.TryGetValue(foundPlayer.gear[i], out foundItem);
+                                Console.Write(foundItem);
+                            }
                         }
                         break;
 
                     default:
-                        break;
+                        break; 
                 }
+
+                PrintMenu();
+                line = Console.ReadLine();
             }
+        }
+
+        public void GetGuild(Player obj)
+        {
+            //find the corresponding guild name
+            guildDictionary.TryGetValue(obj.GuildId, out string gname);
+            Console.WriteLine(gname);
         }
 
     }
@@ -280,6 +322,11 @@ namespace mandc_Assign1
         }
 
         //provide an override to ToString() method
+        public override string ToString()
+        {
+            return String.Format("({0}) {1} |{2}| --{3}--\n\t\"{4}\"\n", type, name, ilvl, requirement, flavor);
+
+        }
     }
 
     public class Player : IComparable
@@ -297,7 +344,7 @@ namespace mandc_Assign1
         uint level;
         uint exp;
         uint guildID;
-        uint[] gear = new uint[14];
+        public uint[] gear = new uint[14];
         List<uint> inventory;
 
         public uint Id //this is my public property
