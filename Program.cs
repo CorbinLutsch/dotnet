@@ -12,15 +12,31 @@ namespace mandc_Assign1
     {
         static void Main(string[] args)
         {
-            string line;
-            string[] tokens;
+            
+            Menu myMenu = new Menu();
+            myMenu.PrintMenu();
+            myMenu.GetOptions();
 
+            
+        }
+    }
+
+    public class Menu 
+    {
+        string line;
+        string[] tokens;
+
+        Dictionary<uint, Item> itemDictionary = new Dictionary<uint, Item>();
+        Dictionary<uint, Player> playerDictionary = new Dictionary<uint, Player>();
+        Dictionary<uint, string> guildDictionary = new Dictionary<uint, string>();
+
+        //default constructor for menu class
+        public Menu()
+        {
             //read the input files
             using (StreamReader inFile = new StreamReader("..\\..\\items.txt"))
             {
                 line = inFile.ReadLine();
-
-                Dictionary<uint, Item> itemDictionary = new Dictionary<uint, Item>();
 
                 while (line != null)
                 {
@@ -33,57 +49,45 @@ namespace mandc_Assign1
                     itemDictionary.Add(Convert.ToUInt32(tokens[0]), myItem);
 
                     line = inFile.ReadLine();
-                }      
+                }
             }
-       
-            using (StreamReader inFile = new StreamReader("..\\..\\players.txt"))
-            { 
-                line = inFile.ReadLine();
 
-                Dictionary<uint, Player> playerDictionary = new Dictionary<uint, Player>();
+            using (StreamReader inFile = new StreamReader("..\\..\\players.txt"))
+            {
+                line = inFile.ReadLine();
 
                 while (line != null)
                 {
                     tokens = line.Split();
 
-                   Player myPlayer = new Player(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]), Convert.ToUInt32(tokens[3]), Convert.ToUInt32(tokens[4]), 
-                      Convert.ToUInt32(tokens[5]),Convert.ToUInt32(tokens[6]), Convert.ToUInt32(tokens[7]), Convert.ToUInt32(tokens[8]), Convert.ToUInt32(tokens[9]),
-                      Convert.ToUInt32(tokens[10]), Convert.ToUInt32(tokens[11]), Convert.ToUInt32(tokens[12]), Convert.ToUInt32(tokens[13]),
-                      Convert.ToUInt32(tokens[14]), Convert.ToUInt32(tokens[15]), Convert.ToUInt32(tokens[16]), Convert.ToUInt32(tokens[17]),
-                      Convert.ToUInt32(tokens[18]), Convert.ToUInt32(tokens[19]));
+                    Player myPlayer = new Player(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]), Convert.ToUInt32(tokens[3]), Convert.ToUInt32(tokens[4]),
+                       Convert.ToUInt32(tokens[5]), Convert.ToUInt32(tokens[6]), Convert.ToUInt32(tokens[7]), Convert.ToUInt32(tokens[8]), Convert.ToUInt32(tokens[9]),
+                       Convert.ToUInt32(tokens[10]), Convert.ToUInt32(tokens[11]), Convert.ToUInt32(tokens[12]), Convert.ToUInt32(tokens[13]),
+                       Convert.ToUInt32(tokens[14]), Convert.ToUInt32(tokens[15]), Convert.ToUInt32(tokens[16]), Convert.ToUInt32(tokens[17]),
+                       Convert.ToUInt32(tokens[18]), Convert.ToUInt32(tokens[19]));
 
                     playerDictionary.Add(Convert.ToUInt32(tokens[0]), myPlayer);
 
                     line = inFile.ReadLine();
-                }         
+                }
             }
 
             using (StreamReader inFile = new StreamReader("..\\..\\guilds.txt"))
             {
                 line = inFile.ReadLine();
-       
-                Dictionary<uint, string> guildDictionary = new Dictionary<uint, string>();
 
                 while (line != null)
                 {
+                    string rebuild = null;
                     tokens = line.Split();
-                    guildDictionary.Add(Convert.ToUInt32(tokens[0]), tokens[1]);           
+                    for (int i = 1; i < tokens.Length; i++)
+                        rebuild += tokens[i] + " ";
+
+                    guildDictionary.Add(Convert.ToUInt32(tokens[0]), rebuild);
                     line = inFile.ReadLine();
                 }
             }
-
-            Menu myMenu = new Menu();
-            myMenu.PrintMenu();
-            myMenu.GetOption();
-            
         }
-    }
-
-    public class Menu 
-    {
-        //default constructor for menu class
-        public Menu()
-        { }
 
         public void PrintMenu()
         {
@@ -101,18 +105,38 @@ namespace mandc_Assign1
             System.Console.WriteLine("\t10.) Quit");
         }
 
-        public void GetOption()
+        public void GetOptions()
         {
-            string line = null;
+            line = null;
 
             while (line != "10" && line != "q" && line != "Q" && line != "quit" && line != "Quit" && line != "exit" && line != "Exit")
             {
                 line = Console.ReadLine();
+
+                switch (line)
+                {
+                    case "1":
+                        foreach (KeyValuePair<uint, Player> obj in playerDictionary)
+                        {
+                            //Write the override ToString player object 
+                            Console.Write(obj.Value);
+
+                            string gname = null;
+                            //find the corresponding guild name
+                            guildDictionary.TryGetValue(obj.Value.GuildId, out gname);
+                            Console.WriteLine(gname);
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
             }
         }
+
     }
 
-    public class Item : Menu, IComparable
+    public class Item : IComparable
     {
         public enum ItemType
         {
@@ -258,7 +282,7 @@ namespace mandc_Assign1
         //provide an override to ToString() method
     }
 
-    public class Player : Menu, IComparable
+    public class Player : IComparable
     {
 
         public enum Race { Orc, Troll, Tauren, Forsaken };
@@ -391,6 +415,11 @@ namespace mandc_Assign1
             }
         }
 
+        public override string ToString()
+        {
+            return String.Format("Name: {0, -10} \t Race: {1, -8}  Level: {2} \t Guild: ", name, race, level);
+
+        }
     }
 
     
