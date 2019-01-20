@@ -80,8 +80,14 @@ namespace mandc_Assign1
                 {
                     string rebuild = null;
                     tokens = line.Split();
+
                     for (int i = 1; i < tokens.Length; i++)
-                        rebuild += tokens[i] + " ";
+                    {
+                        if (i != tokens.Length - 1)
+                            rebuild += tokens[i] + " ";
+                        else
+                            rebuild += tokens[i];
+                    }
 
                     guildDictionary.Add(Convert.ToUInt32(tokens[0]), rebuild);
                     line = inFile.ReadLine();
@@ -106,7 +112,7 @@ namespace mandc_Assign1
 
         public void GetOptions()
         {
-            line = null;
+            line = null;      
 
             line = Console.ReadLine();
 
@@ -144,6 +150,7 @@ namespace mandc_Assign1
                         //LINQ query to find the associated key for the player name
                         var findKey = from K in playerDictionary where K.Value.Name == line select K.Key;
                         Player foundPlayer;
+
                         Item foundItem;
 
                         foreach (uint key in findKey)
@@ -160,6 +167,47 @@ namespace mandc_Assign1
                         }
                         break;
 
+                    case "5": //Leave Guild
+                        Console.Write("Enter the player name: ");
+                        line = Console.ReadLine();
+                        //LINQ query to find the associated guild key for the player name
+                        var findKey2 = from K in playerDictionary where K.Value.Name == line select K.Key;
+                        Player foundPlayer2;
+
+                        foreach (uint key in findKey2)
+                        {
+                            playerDictionary.TryGetValue(key, out foundPlayer2);
+                            foundPlayer2.GuildId = 0;
+                            Console.WriteLine("{0} has left their Guild.", foundPlayer2.Name);
+                        }
+
+                        break;
+
+                    case "6": //Join Guild
+                        Console.Write("Enter the player name: ");
+                        line = Console.ReadLine();
+                        //LINQ query to find the associated guild key for the player name
+                        var findKey3 = from K in playerDictionary where K.Value.Name == line select K.Key;
+                        Player foundPlayer3;
+
+                        foreach (uint key in findKey3)
+                        {
+                            playerDictionary.TryGetValue(key, out foundPlayer3);
+                            Console.Write("Enter the Guild they will join: ");
+                            line = Console.ReadLine();
+
+                            var findGuildKey = from K in guildDictionary where K.Value == line select K.Key;
+
+                            foreach(uint key2 in findGuildKey)
+                            {
+                                foundPlayer3.GuildId = key2;
+                                Console.WriteLine("{0} has joined {1}", foundPlayer3.Name, line);
+                            }
+                            
+                        }         
+                        break;
+
+
                     default:
                         break; 
                 }
@@ -173,8 +221,16 @@ namespace mandc_Assign1
         {
             //find the corresponding guild name
             guildDictionary.TryGetValue(obj.GuildId, out string gname);
-            Console.WriteLine(gname);
+
+            if (obj.GuildId != 0) //if the player is in a guild
+            {
+                Console.Write("Guild: ");
+                Console.WriteLine(gname);
+            }
+            else
+                Console.Write("\n");
         }
+
 
     }
 
@@ -464,7 +520,7 @@ namespace mandc_Assign1
 
         public override string ToString()
         {
-            return String.Format("Name: {0, -10} \t Race: {1, -8}  Level: {2} \t Guild: ", name, race, level);
+            return String.Format("Name: {0, -10} \t Race: {1, -8}  Level: {2} \t", name, race, level);
 
         }
     }
