@@ -333,6 +333,30 @@ namespace mandc_Assign1
                             foundPlayer6.LevelUp();
                         }
                         break;
+                    case "T":
+                        SortedSet<Player> SortedPlayers = new SortedSet<Player>();
+                        SortedSet<Item> SortedItems = new SortedSet<Item>();
+                        foreach(KeyValuePair<uint, Player> p in playerDictionary)
+                        {
+                            SortedPlayers.Add(p.Value);
+                        }
+
+                        foreach (KeyValuePair<uint, Item> i in itemDictionary)
+                        {
+                            SortedItems.Add(i.Value);
+                        }
+                        foreach(Item i in SortedItems)
+                        {
+                            Console.Write(i);
+                        }
+                        foreach(Player p in SortedPlayers)
+                        {
+                            Console.Write(p);
+                            GetGuild(p);
+                        }
+
+
+                        break;
                             default:
                         break; 
                 }
