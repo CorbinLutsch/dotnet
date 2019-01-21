@@ -156,11 +156,11 @@ namespace mandc_Assign1
                         foreach (uint key in findKey)
                         {
                             playerDictionary.TryGetValue(key, out foundPlayer);
-                            Console.Write(foundPlayer);                           
+                            Console.Write(foundPlayer);
                             GetGuild(foundPlayer);
 
                             for (int i = 0; i < foundPlayer.gear.Length; i++)
-                            {                
+                            {
                                 itemDictionary.TryGetValue(foundPlayer.gear[i], out foundItem);
                                 Console.Write(foundItem);
                             }
@@ -198,17 +198,142 @@ namespace mandc_Assign1
 
                             var findGuildKey = from K in guildDictionary where K.Value == line select K.Key;
 
-                            foreach(uint key2 in findGuildKey)
+                            foreach (uint key2 in findGuildKey)
                             {
                                 foundPlayer3.GuildId = key2;
-                                Console.WriteLine("{0} has joined {1}", foundPlayer3.Name, line);
+                                Console.WriteLine("{0} has joined {1}!", foundPlayer3.Name, line);
                             }
-                            
-                        }         
+
+                        }
                         break;
 
+                    case "7":
+                        Console.Write("Enter the player name: ");
+                        line = Console.ReadLine();
+                        //LINQ query to find the associated guild key for the player name
+                        var findKey4 = from K in playerDictionary where K.Value.Name == line select K.Key;
 
-                    default:
+                        foreach (uint key in findKey4)
+                        {
+                            playerDictionary.TryGetValue(key, out Player foundPlayer4);
+
+                            Console.Write("Enter the item name they will equip: ");
+                            line = Console.ReadLine();
+                            //run query to find the corresponding Item 
+                            var findItem = from K in itemDictionary where K.Value.Name == line select K.Value;
+
+                            foreach (Item item in findItem)
+                            {
+                                if (item.Requirement > foundPlayer4.Level)
+                                {
+                                    throw new System.ArgumentException("You do not have the required level to equip this item");
+                                }
+                                else
+                                {
+                                    int save = 0;
+                                    int itemsFound = 0;
+                                    for (int i = 0; i < foundPlayer4.gear.Length; i++)//loop through each gear element
+                                    {
+                                        //find the Item already equipped                                 
+                                        itemDictionary.TryGetValue(foundPlayer4.gear[i], out Item item2);
+
+                                        //if item to equip is equal to the same item spot already equipped
+                                        if (item.Type == item2.Type)
+                                        {
+                                            save = i;
+                                            itemsFound++;
+                                        }
+                                    }
+                                    //if two of the same items are already equipped
+                                    if (itemsFound == 2 && foundPlayer4.equiped && (int)item.Type == 11) //and we havent already equipped one
+                                    {
+                                        foundPlayer4.gear[save] = item.Id; //put it in the higher index
+                                        foundPlayer4.equiped = false;
+                                    }
+                                    else if (itemsFound == 2 && !foundPlayer4.equiped && (int)item.Type == 11)//lower index
+                                    {
+                                        foundPlayer4.gear[save - 1] = item.Id;
+                                        foundPlayer4.equiped = true;
+                                    }
+                                    else if (itemsFound == 2 && foundPlayer4.equiped2 && (int)item.Type == 10) //and we havent already equipped one
+                                    {
+                                        foundPlayer4.gear[save] = item.Id; //put it in the higher index
+                                        foundPlayer4.equiped = false;
+                                    }
+                                    else if (itemsFound == 2 && !foundPlayer4.equiped2 && (int)item.Type == 10)//lower index
+                                    {
+                                        foundPlayer4.gear[save - 1] = item.Id;
+                                        foundPlayer4.equiped = true;
+                                    }
+                                    else if (itemsFound == 1 && ((int)item.Type == 10 || (int)item.Type == 11))
+                                    {
+                                        if (save % 2 == 0) //then the upper index is occupied
+                                        {
+                                            foundPlayer4.gear[save - 1] = item.Id; //put in lower index
+                                        }
+                                        else
+                                        {
+                                            foundPlayer4.gear[save + 1] = item.Id; //put in upper index
+                                        }
+                                    }
+                                    else //the spot is open
+                                    {
+                                        foundPlayer4.gear[(int)item.Type] = item.Id;
+                                    }
+
+                                    Console.Write("{0} successfully equipped {1}!", foundPlayer4.Name, item.Name);
+                                }
+
+                            }
+
+                        }
+                        break;
+
+                    case "8": //unequip gear
+                        Console.Write("Enter the player name: ");
+                        line = Console.ReadLine();
+                        //LINQ query to find the associated guild key for the player name
+                        var findKey5 = from K in playerDictionary where K.Value.Name == line select K.Key;
+
+                        foreach (uint key in findKey5)
+                        {
+                            playerDictionary.TryGetValue(key, out Player foundPlayer5);
+
+                            Console.WriteLine("Enter the item slot number they will unequip: ");
+                            Console.WriteLine("0 = Helmet");
+                            Console.WriteLine("1 = Neck");
+                            Console.WriteLine("2 = Shoulders");
+                            Console.WriteLine("3 = Back");
+                            Console.WriteLine("4 = Chest");
+                            Console.WriteLine("5 = Wrist");
+                            Console.WriteLine("6 = Gloves");
+                            Console.WriteLine("7 = Belt");
+                            Console.WriteLine("8 = Pants");
+                            Console.WriteLine("9 = Boots");
+                            Console.WriteLine("10 = Ring");
+                            Console.WriteLine("11 = Trinket");
+
+                            line = Console.ReadLine();
+                            foundPlayer5.UnequipGear(Convert.ToInt32(line));
+                        }
+                        break;
+
+                    case "9": //Award experience
+                        Console.Write("Enter the player name: ");
+                        line = Console.ReadLine();
+                        //LINQ query to find the associated guild key for the player name
+                        var findKey6 = from K in playerDictionary where K.Value.Name == line select K.Key;
+
+                        foreach (uint key in findKey6)
+                        {
+                            playerDictionary.TryGetValue(key, out Player foundPlayer6);
+                            Console.Write("Enter the amount of experience to award: ");
+                            line = Console.ReadLine();
+                            foundPlayer6.Exp += Convert.ToUInt32(line);
+                            foundPlayer6.LevelUp();
+                        }
+                        break;
+                            default:
                         break; 
                 }
 
@@ -387,6 +512,8 @@ namespace mandc_Assign1
 
     public class Player : IComparable
     {
+        public bool equiped = false;
+        public bool equiped2 = false;
 
         public enum Race { Orc, Troll, Tauren, Forsaken };
 
@@ -401,7 +528,7 @@ namespace mandc_Assign1
         uint exp;
         uint guildID;
         public uint[] gear = new uint[14];
-        List<uint> inventory;
+        List<uint> inventory = new List<uint>(); 
 
         public uint Id //this is my public property
         {
@@ -460,6 +587,7 @@ namespace mandc_Assign1
             {
                 exp = exp - (level * 1000);
                 level++;
+                Console.WriteLine("Ding!");
             }
         } //function determines how a player levels up
 
@@ -503,19 +631,31 @@ namespace mandc_Assign1
 
         public void EquipGear(uint newGearID)
         {
-            //is it a valid piece of gear?
-            //is newGearID an item id?
-
-            //&& does the player's level match the item requirement?       
+           
+      
 
         }
 
         public void UnequipGear(int gearSlot)
         {
+            
             if (gear[gearSlot] != 0)
             {
-
+                if (inventory.Count >= MAX_INVENTORY_SIZE)
+                {
+                    throw new System.ArgumentException("Inventory is full");
+                }
+                else
+                {
+                    inventory.Add(gear[gearSlot]);
+                    gear[gearSlot] = 0;
+                }      
             }
+            else
+            {
+                throw new System.ArgumentException("Nothing to remove"); 
+            }
+            
         }
 
         public override string ToString()
