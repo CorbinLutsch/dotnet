@@ -15,10 +15,15 @@ namespace mandc_Assign1
             Console.WriteLine("Welcome to the World of ConflictCraft: Testing Environment!\n");
             Menu myMenu = new Menu();
             myMenu.PrintMenu();
-            myMenu.GetOptions();
-
-            
+            myMenu.GetOptions(); 
         }
+    }
+
+    public static class Global
+    {
+        public static Dictionary<uint, Item> itemDictionary = new Dictionary<uint, Item>();
+        public static Dictionary<uint, Player> playerDictionary = new Dictionary<uint, Player>();
+        public static Dictionary<uint, string> guildDictionary = new Dictionary<uint, string>();
     }
 
     public class Menu 
@@ -26,61 +31,64 @@ namespace mandc_Assign1
         string line;
         string[] tokens;
 
-        Dictionary<uint, Item> itemDictionary = new Dictionary<uint, Item>();
-        Dictionary<uint, Player> playerDictionary = new Dictionary<uint, Player>();
-        Dictionary<uint, string> guildDictionary = new Dictionary<uint, string>();
-
         //default constructor for menu class
         public Menu()
         {
-            //read the input files
+            //read the item input file
             using (StreamReader inFile = new StreamReader("..\\..\\items.txt"))
             {
                 line = inFile.ReadLine();
 
                 while (line != null)
                 {
+                    //split the string read in
                     tokens = line.Split('\t');
 
+                    //create an item object
                     Item myItem = new Item(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]),
                        Convert.ToUInt32(tokens[3]), Convert.ToUInt32(tokens[4]), Convert.ToUInt32(tokens[5]),
                        Convert.ToUInt32(tokens[6]), tokens[7]);
 
-                    itemDictionary.Add(Convert.ToUInt32(tokens[0]), myItem);
+                    Global.itemDictionary.Add(Convert.ToUInt32(tokens[0]), myItem);
 
                     line = inFile.ReadLine();
                 }
             }
 
+            //read the players input file
             using (StreamReader inFile = new StreamReader("..\\..\\players.txt"))
             {
                 line = inFile.ReadLine();
 
                 while (line != null)
                 {
-                    tokens = line.Split();
+                    tokens = line.Split(); //again, splitting the string up 
 
+                    //tokens must be converted to the proper value for each attribute in the Player class
                     Player myPlayer = new Player(Convert.ToUInt32(tokens[0]), tokens[1], Convert.ToUInt32(tokens[2]), Convert.ToUInt32(tokens[3]), Convert.ToUInt32(tokens[4]),
                        Convert.ToUInt32(tokens[5]), Convert.ToUInt32(tokens[6]), Convert.ToUInt32(tokens[7]), Convert.ToUInt32(tokens[8]), Convert.ToUInt32(tokens[9]),
                        Convert.ToUInt32(tokens[10]), Convert.ToUInt32(tokens[11]), Convert.ToUInt32(tokens[12]), Convert.ToUInt32(tokens[13]),
                        Convert.ToUInt32(tokens[14]), Convert.ToUInt32(tokens[15]), Convert.ToUInt32(tokens[16]), Convert.ToUInt32(tokens[17]),
                        Convert.ToUInt32(tokens[18]), Convert.ToUInt32(tokens[19]));
 
-                    playerDictionary.Add(Convert.ToUInt32(tokens[0]), myPlayer);
+                    Global.playerDictionary.Add(Convert.ToUInt32(tokens[0]), myPlayer);
 
                     line = inFile.ReadLine();
                 }
             }
 
+            //read in the guilds text file
             using (StreamReader inFile = new StreamReader("..\\..\\guilds.txt"))
             {
                 line = inFile.ReadLine();
 
                 while (line != null)
                 {
-                    string rebuild = null;
-                    tokens = line.Split();
+                    string rebuild = null; //to hold the rebuilded string
+                    tokens = line.Split();//seperate the guild ID from the rest of the string
 
+                    //now piece back the guild name since guilds can be more than one word 
+                    //seperated by spaces 
                     for (int i = 1; i < tokens.Length; i++)
                     {
                         if (i != tokens.Length - 1)
@@ -89,12 +97,13 @@ namespace mandc_Assign1
                             rebuild += tokens[i];
                     }
 
-                    guildDictionary.Add(Convert.ToUInt32(tokens[0]), rebuild);
+                    Global.guildDictionary.Add(Convert.ToUInt32(tokens[0]), rebuild);
                     line = inFile.ReadLine();
                 }
             }
         }
 
+        //method to print the options
         public void PrintMenu()
         {
             Console.WriteLine("\nWelcome to World of ConflictCraft: Testing Environment. Please select an option from the list below: ");
@@ -111,9 +120,7 @@ namespace mandc_Assign1
         }
 
         public void GetOptions()
-        {
-            line = null;      
-
+        {  
             line = Console.ReadLine();
 
             while (line != "10" && line != "q" && line != "Q" && line != "quit" && line != "Quit" && line != "exit" && line != "Exit")
@@ -121,63 +128,62 @@ namespace mandc_Assign1
                 switch (line)
                 {
                     case "1": //Print All Players
-                        foreach (KeyValuePair<uint, Player> obj in playerDictionary)
-                        {
-                            //Write the override ToString player object 
-                            Console.Write(obj.Value);
+                        foreach (KeyValuePair<uint, Player> obj in Global.playerDictionary)
+                        {                        
+                            Console.Write(obj.Value); //call to the Players override ToString() method
 
-                            GetGuild(obj.Value);
+                            GetGuild(obj.Value);//prints the guild associated with the player
                         }
                         break;
 
                     case "2": //Print All Guilds
-                        foreach (KeyValuePair<uint, string> obj in guildDictionary)
+                        foreach (KeyValuePair<uint, string> obj in Global.guildDictionary)
                         {
-                            Console.WriteLine(obj.Value);
+                            Console.WriteLine(obj.Value); 
                         }
                         break;
 
                     case "3": //Print All Gear
-                        foreach (KeyValuePair<uint, Item> obj in itemDictionary)
+                        foreach (KeyValuePair<uint, Item> obj in Global.itemDictionary)
                         {
-                            Console.Write(obj.Value);
+                            Console.Write(obj.Value); //call to Items override ToString() method
                         }
                         break;
 
                     case "4": //print gear for a specific player 
+
                         Console.Write("Enter the player name: ");
                         line = Console.ReadLine();
-                        //LINQ query to find the associated key for the player name
-                        var findKey = from K in playerDictionary where K.Value.Name == line select K.Key;
-                        Player foundPlayer;
 
-                        Item foundItem;
+                        //LINQ query to find the associated player object
+                        var findKey = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
                         foreach (uint key in findKey)
                         {
-                            playerDictionary.TryGetValue(key, out foundPlayer);
-                            Console.Write(foundPlayer);
+                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer); //get the player object associated with the name
+                            Console.Write(foundPlayer); //print the player's information                           
                             GetGuild(foundPlayer);
 
                             for (int i = 0; i < foundPlayer.gear.Length; i++)
                             {
-                                itemDictionary.TryGetValue(foundPlayer.gear[i], out foundItem);
-                                Console.Write(foundItem);
+                                Global.itemDictionary.TryGetValue(foundPlayer.gear[i], out Item foundItem); //find each item object the player is wearing 
+                                Console.Write(foundItem); //print the item's information
                             }
                         }
                         break;
 
                     case "5": //Leave Guild
+
                         Console.Write("Enter the player name: ");
                         line = Console.ReadLine();
-                        //LINQ query to find the associated guild key for the player name
-                        var findKey2 = from K in playerDictionary where K.Value.Name == line select K.Key;
-                        Player foundPlayer2;
+
+                        //LINQ query to find the associated player object
+                        var findKey2 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;    
 
                         foreach (uint key in findKey2)
                         {
-                            playerDictionary.TryGetValue(key, out foundPlayer2);
-                            foundPlayer2.GuildId = 0;
+                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer2);
+                            foundPlayer2.GuildId = 0; //set the guildId to 0 which means none in this context
                             Console.WriteLine("{0} has left their Guild.", foundPlayer2.Name);
                         }
 
@@ -186,17 +192,18 @@ namespace mandc_Assign1
                     case "6": //Join Guild
                         Console.Write("Enter the player name: ");
                         line = Console.ReadLine();
-                        //LINQ query to find the associated guild key for the player name
-                        var findKey3 = from K in playerDictionary where K.Value.Name == line select K.Key;
-                        Player foundPlayer3;
+
+                        //LINQ query to find the associated Player object
+                        var findKey3 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
                         foreach (uint key in findKey3)
                         {
-                            playerDictionary.TryGetValue(key, out foundPlayer3);
+                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer3);
                             Console.Write("Enter the Guild they will join: ");
                             line = Console.ReadLine();
 
-                            var findGuildKey = from K in guildDictionary where K.Value == line select K.Key;
+                            //LINQ query to find the guild key associated with the name of the guild to join
+                            var findGuildKey = from K in Global.guildDictionary where K.Value == line select K.Key;
 
                             foreach (uint key2 in findGuildKey)
                             {
@@ -207,97 +214,42 @@ namespace mandc_Assign1
                         }
                         break;
 
-                    case "7":
+                    case "7": //Equip Item
+
                         Console.Write("Enter the player name: ");
                         line = Console.ReadLine();
-                        //LINQ query to find the associated guild key for the player name
-                        var findKey4 = from K in playerDictionary where K.Value.Name == line select K.Key;
+
+                        //LINQ query to find the associated Player object
+                        var findKey4 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
                         foreach (uint key in findKey4)
-                        {
-                            playerDictionary.TryGetValue(key, out Player foundPlayer4);
+                        { //gets the Player object for the person entered
+                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer4);
 
                             Console.Write("Enter the item name they will equip: ");
                             line = Console.ReadLine();
-                            //run query to find the corresponding Item 
-                            var findItem = from K in itemDictionary where K.Value.Name == line select K.Value;
 
-                            foreach (Item item in findItem)
+                            //run query to find the corresponding Item object
+                            var findItem = from K in Global.itemDictionary where K.Value.Name == line select K.Key;
+
+                            foreach (uint key2 in findItem)
                             {
-                                if (item.Requirement > foundPlayer4.Level)
-                                {
-                                    throw new System.ArgumentException("You do not have the required level to equip this item");
-                                }
-                                else
-                                {
-                                    int save = 0;
-                                    int itemsFound = 0;
-                                    for (int i = 0; i < foundPlayer4.gear.Length; i++)//loop through each gear element
-                                    {
-                                        //find the Item already equipped                                 
-                                        itemDictionary.TryGetValue(foundPlayer4.gear[i], out Item item2);
-
-                                        //if item to equip is equal to the same item spot already equipped
-                                        if (item.Type == item2.Type)
-                                        {
-                                            save = i;
-                                            itemsFound++;
-                                        }
-                                    }
-                                    //if two of the same items are already equipped
-                                    if (itemsFound == 2 && foundPlayer4.equiped && (int)item.Type == 11) //and we havent already equipped one
-                                    {
-                                        foundPlayer4.gear[save] = item.Id; //put it in the higher index
-                                        foundPlayer4.equiped = false;
-                                    }
-                                    else if (itemsFound == 2 && !foundPlayer4.equiped && (int)item.Type == 11)//lower index
-                                    {
-                                        foundPlayer4.gear[save - 1] = item.Id;
-                                        foundPlayer4.equiped = true;
-                                    }
-                                    else if (itemsFound == 2 && foundPlayer4.equiped2 && (int)item.Type == 10) //and we havent already equipped one
-                                    {
-                                        foundPlayer4.gear[save] = item.Id; //put it in the higher index
-                                        foundPlayer4.equiped = false;
-                                    }
-                                    else if (itemsFound == 2 && !foundPlayer4.equiped2 && (int)item.Type == 10)//lower index
-                                    {
-                                        foundPlayer4.gear[save - 1] = item.Id;
-                                        foundPlayer4.equiped = true;
-                                    }
-                                    else if (itemsFound == 1 && ((int)item.Type == 10 || (int)item.Type == 11))
-                                    {
-                                        if (save % 2 == 0) //then the upper index is occupied
-                                        {
-                                            foundPlayer4.gear[save - 1] = item.Id; //put in lower index
-                                        }
-                                        else
-                                        {
-                                            foundPlayer4.gear[save + 1] = item.Id; //put in upper index
-                                        }
-                                    }
-                                    else //the spot is open
-                                    {
-                                        foundPlayer4.gear[(int)item.Type] = item.Id;
-                                    }
-
-                                    Console.Write("{0} successfully equipped {1}!", foundPlayer4.Name, item.Name);
-                                }
-
+                                foundPlayer4.EquipGear(key2);
                             }
-
                         }
                         break;
 
                     case "8": //unequip gear
+
                         Console.Write("Enter the player name: ");
                         line = Console.ReadLine();
+
                         //LINQ query to find the associated guild key for the player name
-                        var findKey5 = from K in playerDictionary where K.Value.Name == line select K.Key;
+                        var findKey5 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
                         foreach (uint key in findKey5)
                         {
-                            playerDictionary.TryGetValue(key, out Player foundPlayer5);
+                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer5);
 
                             Console.WriteLine("Enter the item slot number they will unequip: ");
                             Console.WriteLine("0 = Helmet");
@@ -319,29 +271,33 @@ namespace mandc_Assign1
                         break;
 
                     case "9": //Award experience
+
                         Console.Write("Enter the player name: ");
                         line = Console.ReadLine();
+
                         //LINQ query to find the associated guild key for the player name
-                        var findKey6 = from K in playerDictionary where K.Value.Name == line select K.Key;
+                        var findKey6 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
                         foreach (uint key in findKey6)
                         {
-                            playerDictionary.TryGetValue(key, out Player foundPlayer6);
+                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer6);
                             Console.Write("Enter the amount of experience to award: ");
                             line = Console.ReadLine();
                             foundPlayer6.Exp += Convert.ToUInt32(line);
-                            foundPlayer6.LevelUp();
+                            //foundPlayer6.LevelUp();
                         }
                         break;
-                    case "T":
+
+                    case "T": //Sort the Players and Items "hidden option"
+
                         SortedSet<Player> SortedPlayers = new SortedSet<Player>();
                         SortedSet<Item> SortedItems = new SortedSet<Item>();
-                        foreach(KeyValuePair<uint, Player> p in playerDictionary)
+                        foreach(KeyValuePair<uint, Player> p in Global.playerDictionary)
                         {
                             SortedPlayers.Add(p.Value);
                         }
 
-                        foreach (KeyValuePair<uint, Item> i in itemDictionary)
+                        foreach (KeyValuePair<uint, Item> i in Global.itemDictionary)
                         {
                             SortedItems.Add(i.Value);
                         }
@@ -354,10 +310,9 @@ namespace mandc_Assign1
                             Console.Write(p);
                             GetGuild(p);
                         }
-
-
                         break;
-                            default:
+
+                 default:
                         break; 
                 }
 
@@ -369,7 +324,7 @@ namespace mandc_Assign1
         public void GetGuild(Player obj)
         {
             //find the corresponding guild name
-            guildDictionary.TryGetValue(obj.GuildId, out string gname);
+            Global.guildDictionary.TryGetValue(obj.GuildId, out string gname);
 
             if (obj.GuildId != 0) //if the player is in a guild
             {
@@ -502,7 +457,7 @@ namespace mandc_Assign1
 
         //default constructor #2
         public Item(uint i, string n, uint ty, uint ilv, uint prim, uint stam,
-        uint req, string flav) //ItemType ty?
+        uint req, string flav) 
         {
             id = i;
             name = n;
@@ -589,7 +544,10 @@ namespace mandc_Assign1
                 exp += value;
                 //if exp exceeds required experience for this player
                 //to increase their level but not exceed MAX_LEVEl
-                LevelUp();
+                while (exp >= (level * 1000) && level != MAX_LEVEL)
+                {
+                    LevelUp();
+                }
             }
         }
 
@@ -607,12 +565,10 @@ namespace mandc_Assign1
 
         public void LevelUp()
         {
-            while (exp >= (level * 1000) && level != MAX_LEVEL)
-            {
                 exp = exp - (level * 1000);
                 level++;
                 Console.WriteLine("Ding!");
-            }
+            
         } //function determines how a player levels up
 
         public Player(uint id, string name, uint race, uint level, uint exp, uint guildID, params uint[] gear)
@@ -655,9 +611,73 @@ namespace mandc_Assign1
 
         public void EquipGear(uint newGearID)
         {
-           
-      
+            
+            var findItem = from K in Global.itemDictionary where K.Key == newGearID select K.Value;
 
+            foreach (Item item in findItem)
+            {
+                if (item.Requirement > Level)
+                {
+                    throw new System.ArgumentException("You do not have the required level to equip this item");
+                }
+                else
+                {
+                    int save = 0;
+                    int itemsFound = 0;
+
+                    for (int i = 0; i < gear.Length; i++)//loop through each gear element
+                    {
+                        //find the Item already equipped                                 
+                        Global.itemDictionary.TryGetValue(gear[i], out Item item2);
+
+                        //if item to equip is equal to the same item spot already equipped
+                        if (item.Type == item2.Type)
+                        {
+                            save = i;
+                            itemsFound++;
+                        }
+                    }
+                    //if two of the same items are already equipped
+                    if (itemsFound == 2 && equiped && (int)item.Type == 11) //and we havent already equipped one
+                    {
+                        gear[save] = item.Id; //put it in the higher index
+                        equiped = false;
+                    }
+                    else if (itemsFound == 2 && !equiped && (int)item.Type == 11)//lower index
+                    {
+                        gear[save - 1] = item.Id;
+                        equiped = true;
+                    }
+                    else if (itemsFound == 2 && equiped2 && (int)item.Type == 10) //and we havent already equipped one
+                    {
+                        gear[save] = item.Id; //put it in the higher index
+                        equiped = false;
+                    }
+                    else if (itemsFound == 2 && !equiped2 && (int)item.Type == 10)//lower index
+                    {
+                        gear[save - 1] = item.Id;
+                        equiped = true;
+                    }
+                    else if (itemsFound == 1 && ((int)item.Type == 10 || (int)item.Type == 11))
+                    {
+                        if (save % 2 == 0) //then the upper index is occupied
+                        {
+                            gear[save - 1] = item.Id; //put in lower index
+                        }
+                        else
+                        {
+                            gear[save + 1] = item.Id; //put in upper index
+                        }
+                    }
+                    else //the spot is open
+                    {
+                        gear[(int)item.Type] = item.Id;
+                    }
+
+                    Console.WriteLine("{0} successfully equipped {1}!", Name, item.Name);
+                }
+
+            }
         }
 
         public void UnequipGear(int gearSlot)
