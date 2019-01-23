@@ -128,6 +128,7 @@ namespace mandc_Assign1
                 switch (line)
                 {
                     case "1": //Print All Players
+
                         foreach (KeyValuePair<uint, Player> obj in Global.playerDictionary)
                         {                        
                             Console.Write(obj.Value); //call to the Players override ToString() method
@@ -137,6 +138,7 @@ namespace mandc_Assign1
                         break;
 
                     case "2": //Print All Guilds
+
                         foreach (KeyValuePair<uint, string> obj in Global.guildDictionary)
                         {
                             Console.WriteLine(obj.Value); 
@@ -144,6 +146,7 @@ namespace mandc_Assign1
                         break;
 
                     case "3": //Print All Gear
+
                         foreach (KeyValuePair<uint, Item> obj in Global.itemDictionary)
                         {
                             Console.Write(obj.Value); //call to Items override ToString() method
@@ -162,11 +165,11 @@ namespace mandc_Assign1
                         {
                             Global.playerDictionary.TryGetValue(key, out Player foundPlayer); //get the player object associated with the name
                             Console.Write(foundPlayer); //print the player's information                           
-                            GetGuild(foundPlayer);
+                            GetGuild(foundPlayer); //including the guild their in
 
                             for (int i = 0; i < foundPlayer.gear.Length; i++)
                             {
-                                Global.itemDictionary.TryGetValue(foundPlayer.gear[i], out Item foundItem); //find each item object the player is wearing 
+                                Global.itemDictionary.TryGetValue(foundPlayer.gear[i], out Item foundItem); //find each Item object that the player is wearing 
                                 Console.Write(foundItem); //print the item's information
                             }
                         }
@@ -183,13 +186,15 @@ namespace mandc_Assign1
                         foreach (uint key in findKey2)
                         {
                             Global.playerDictionary.TryGetValue(key, out Player foundPlayer2);
-                            foundPlayer2.GuildId = 0; //set the guildId to 0 which means none in this context
+
+                            foundPlayer2.GuildId = 0; //set the guildId to 0 which means "no guild" in this context
                             Console.WriteLine("{0} has left their Guild.", foundPlayer2.Name);
                         }
 
                         break;
 
                     case "6": //Join Guild
+
                         Console.Write("Enter the player name: ");
                         line = Console.ReadLine();
 
@@ -199,6 +204,7 @@ namespace mandc_Assign1
                         foreach (uint key in findKey3)
                         {
                             Global.playerDictionary.TryGetValue(key, out Player foundPlayer3);
+
                             Console.Write("Enter the Guild they will join: ");
                             line = Console.ReadLine();
 
@@ -207,7 +213,7 @@ namespace mandc_Assign1
 
                             foreach (uint key2 in findGuildKey)
                             {
-                                foundPlayer3.GuildId = key2;
+                                foundPlayer3.GuildId = key2; //set the new guildId for that player
                                 Console.WriteLine("{0} has joined {1}!", foundPlayer3.Name, line);
                             }
 
@@ -239,7 +245,7 @@ namespace mandc_Assign1
                         }
                         break;
 
-                    case "8": //unequip gear
+                    case "8": //Unequip gear
 
                         Console.Write("Enter the player name: ");
                         line = Console.ReadLine();
@@ -281,10 +287,10 @@ namespace mandc_Assign1
                         foreach (uint key in findKey6)
                         {
                             Global.playerDictionary.TryGetValue(key, out Player foundPlayer6);
+
                             Console.Write("Enter the amount of experience to award: ");
                             line = Console.ReadLine();
                             foundPlayer6.Exp += Convert.ToUInt32(line);
-                            //foundPlayer6.LevelUp();
                         }
                         break;
 
@@ -314,11 +320,11 @@ namespace mandc_Assign1
 
                  default:
                         break; 
-                }
+                } //end of switch statement
 
-                PrintMenu();
-                line = Console.ReadLine();
-            }
+                PrintMenu(); //reprint the menu
+                line = Console.ReadLine(); //get user input
+            }//end of while loop
         }
 
         public void GetGuild(Player obj)
@@ -611,7 +617,7 @@ namespace mandc_Assign1
 
         public void EquipGear(uint newGearID)
         {
-            
+            //LINQ to find the item object we will equip
             var findItem = from K in Global.itemDictionary where K.Key == newGearID select K.Value;
 
             foreach (Item item in findItem)
@@ -627,51 +633,53 @@ namespace mandc_Assign1
 
                     for (int i = 0; i < gear.Length; i++)//loop through each gear element
                     {
-                        //find the Item already equipped                                 
+                        //Find the corresponding Item object                              
                         Global.itemDictionary.TryGetValue(gear[i], out Item item2);
 
                         //if item to equip is equal to the same item spot already equipped
+                        //e.g. Helmet == Helmet, or Ring == Ring, then we know this is the correct spot to put it
                         if (item.Type == item2.Type)
                         {
                             save = i;
-                            itemsFound++;
+                            itemsFound++; //keep track of how many times we encounter the item
                         }
                     }
-                    //if two of the same items are already equipped
-                    if (itemsFound == 2 && equiped && (int)item.Type == 11) //and we havent already equipped one
+
+                    //if two of the same items are already equipped and it's a trinket
+                    if (itemsFound == 2 && equiped && (int)item.Type == 11) //and we have already equipped once before
                     {
                         gear[save] = item.Id; //put it in the higher index
                         equiped = false;
                     }
-                    else if (itemsFound == 2 && !equiped && (int)item.Type == 11)//lower index
+                    else if (itemsFound == 2 && !equiped && (int)item.Type == 11)//two of the same items, trinket, havent equipped
                     {
-                        gear[save - 1] = item.Id;
+                        gear[save - 1] = item.Id; //put it in the lower index 
                         equiped = true;
                     }
-                    else if (itemsFound == 2 && equiped2 && (int)item.Type == 10) //and we havent already equipped one
+                    else if (itemsFound == 2 && equiped2 && (int)item.Type == 10) //same thing but with the ring location
                     {
                         gear[save] = item.Id; //put it in the higher index
                         equiped = false;
                     }
-                    else if (itemsFound == 2 && !equiped2 && (int)item.Type == 10)//lower index
+                    else if (itemsFound == 2 && !equiped2 && (int)item.Type == 10)
                     {
-                        gear[save - 1] = item.Id;
+                        gear[save - 1] = item.Id; //put it in the lwoer index
                         equiped = true;
                     }
-                    else if (itemsFound == 1 && ((int)item.Type == 10 || (int)item.Type == 11))
+                    else if (itemsFound == 1 && ((int)item.Type == 10 || (int)item.Type == 11)) //if only 1 ring or 1 trinket currently equipped
                     {
                         if (save % 2 == 0) //then the upper index is occupied
                         {
                             gear[save - 1] = item.Id; //put in lower index
                         }
-                        else
+                        else //the lower index is occupied
                         {
                             gear[save + 1] = item.Id; //put in upper index
                         }
                     }
                     else //the spot is open
                     {
-                        gear[(int)item.Type] = item.Id;
+                        gear[(int)item.Type] = item.Id; //SO JUST PUT THE DAMN THING IN THERE SHEESH!
                     }
 
                     Console.WriteLine("{0} successfully equipped {1}!", Name, item.Name);
@@ -683,16 +691,16 @@ namespace mandc_Assign1
         public void UnequipGear(int gearSlot)
         {
             
-            if (gear[gearSlot] != 0)
+            if (gear[gearSlot] != 0) //if the gear slot is not empty
             {
-                if (inventory.Count >= MAX_INVENTORY_SIZE)
+                if (inventory.Count >= MAX_INVENTORY_SIZE) //is the inventory full?
                 {
                     throw new System.ArgumentException("Inventory is full");
                 }
                 else
                 {
-                    inventory.Add(gear[gearSlot]);
-                    gear[gearSlot] = 0;
+                    inventory.Add(gear[gearSlot]); //add the item to the inventory
+                    gear[gearSlot] = 0; //set the gear slot to empty
                 }      
             }
             else
