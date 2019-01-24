@@ -12,6 +12,7 @@ namespace mandc_Assign1
     {
         static void Main(string[] args)
         {
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Welcome to the World of ConflictCraft: Testing Environment!\n");
             Menu myMenu = new Menu();
             myMenu.PrintMenu();
@@ -161,6 +162,9 @@ namespace mandc_Assign1
                         //LINQ query to find the associated player object
                         var findKey = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
+                        if (!findKey.Any())
+                            Console.WriteLine("'{0}' is not a valid player name.", line);
+
                         foreach (uint key in findKey)
                         {
                             Global.playerDictionary.TryGetValue(key, out Player foundPlayer); //get the player object associated with the name
@@ -181,7 +185,10 @@ namespace mandc_Assign1
                         line = Console.ReadLine();
 
                         //LINQ query to find the associated player object
-                        var findKey2 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;    
+                        var findKey2 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
+
+                        if (!findKey2.Any())
+                            Console.WriteLine("'{0}' is not a valid player name.", line);
 
                         foreach (uint key in findKey2)
                         {
@@ -201,6 +208,9 @@ namespace mandc_Assign1
                         //LINQ query to find the associated Player object
                         var findKey3 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
+                        if (!findKey3.Any())
+                            Console.WriteLine("'{0}' is not a valid player name.", line);
+
                         foreach (uint key in findKey3)
                         {
                             Global.playerDictionary.TryGetValue(key, out Player foundPlayer3);
@@ -210,6 +220,9 @@ namespace mandc_Assign1
 
                             //LINQ query to find the guild key associated with the name of the guild to join
                             var findGuildKey = from K in Global.guildDictionary where K.Value == line select K.Key;
+
+                            if (!findGuildKey.Any())
+                                Console.WriteLine("'{0}' is not a valid guild name.", line);
 
                             foreach (uint key2 in findGuildKey)
                             {
@@ -228,6 +241,9 @@ namespace mandc_Assign1
                         //LINQ query to find the associated Player object
                         var findKey4 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
+                        if (!findKey4.Any())
+                            Console.WriteLine("'{0}' is not a valid player name.", line);
+
                         foreach (uint key in findKey4)
                         { //gets the Player object for the person entered
                             Global.playerDictionary.TryGetValue(key, out Player foundPlayer4);
@@ -237,6 +253,9 @@ namespace mandc_Assign1
 
                             //run query to find the corresponding Item object
                             var findItem = from K in Global.itemDictionary where K.Value.Name == line select K.Key;
+
+                            if (!findItem.Any())
+                                Console.WriteLine("'{0}' is not a valid item name.", line);
 
                             foreach (uint key2 in findItem)
                             {
@@ -252,6 +271,9 @@ namespace mandc_Assign1
 
                         //LINQ query to find the associated guild key for the player name
                         var findKey5 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
+
+                        if (!findKey5.Any())
+                            Console.WriteLine("'{0}' is not a valid player name.", line);
 
                         foreach (uint key in findKey5)
                         {
@@ -284,6 +306,9 @@ namespace mandc_Assign1
                         //LINQ query to find the associated guild key for the player name
                         var findKey6 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
+                        if (!findKey6.Any())
+                            Console.WriteLine("'{0}' is not a valid player name.", line);
+
                         foreach (uint key in findKey6)
                         {
                             Global.playerDictionary.TryGetValue(key, out Player foundPlayer6);
@@ -298,6 +323,7 @@ namespace mandc_Assign1
 
                         SortedSet<Player> SortedPlayers = new SortedSet<Player>();
                         SortedSet<Item> SortedItems = new SortedSet<Item>();
+
                         foreach(KeyValuePair<uint, Player> p in Global.playerDictionary)
                         {
                             SortedPlayers.Add(p.Value);
@@ -587,6 +613,7 @@ namespace mandc_Assign1
             this.guildID = guildID;
             for (int i = 0; i < gear.Length; i++)
                 this.gear[i] = gear[i];
+
         }
 
         public Player()
@@ -620,7 +647,7 @@ namespace mandc_Assign1
             //LINQ to find the item object we will equip
             var findItem = from K in Global.itemDictionary where K.Key == newGearID select K.Value;
 
-            foreach (Item item in findItem)
+            foreach (Item item in findItem) //the item to equip
             {
                 if (item.Requirement > Level)
                 {
@@ -633,6 +660,9 @@ namespace mandc_Assign1
 
                     for (int i = 0; i < gear.Length; i++)//loop through each gear element
                     {
+                        if (gear[i] == 0) //don't waste time searching for an empty item 
+                            continue; 
+
                         //Find the corresponding Item object                              
                         Global.itemDictionary.TryGetValue(gear[i], out Item item2);
 
@@ -690,24 +720,32 @@ namespace mandc_Assign1
 
         public void UnequipGear(int gearSlot)
         {
-            
-            if (gear[gearSlot] != 0) //if the gear slot is not empty
+
+            if (gearSlot <= 11 && gearSlot >= 0)
             {
-                if (inventory.Count >= MAX_INVENTORY_SIZE) //is the inventory full?
+
+                if (gear[gearSlot] != 0) //if the gear slot is not empty
                 {
-                    throw new System.ArgumentException("Inventory is full");
+                    if (inventory.Count >= MAX_INVENTORY_SIZE) //is the inventory full?
+                    {
+                        throw new System.ArgumentException("Inventory is full");
+                    }
+                    else
+                    {
+                        inventory.Add(gear[gearSlot]); //add the item to the inventory                      
+                        gear[gearSlot] = 0; //set the gear slot to empty
+                        Console.WriteLine("Successfully unequipped item.");
+                    }
                 }
                 else
                 {
-                    inventory.Add(gear[gearSlot]); //add the item to the inventory
-                    gear[gearSlot] = 0; //set the gear slot to empty
-                }      
+                    throw new System.ArgumentException("Nothing to remove");
+                }
             }
             else
             {
-                throw new System.ArgumentException("Nothing to remove"); 
+                Console.WriteLine("'{0}' is an invalid item slot", gearSlot);
             }
-            
         }
 
         public override string ToString()
