@@ -1,4 +1,12 @@
-﻿using System;
+﻿/* Corbin Lutsch & Mathew Lord
+ *     Z1837389  & Z1848456
+ *  CSCI - 473
+ *  Due: 01/31/19
+ *  Assignment 1 - Getting Comfortable 
+ * 
+ */
+
+using System;
 using System.IO; //for stream reader
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +28,7 @@ namespace mandc_Assign1
         }
     }
 
-    public static class Global
+    public static class Global 
     {
         public static Dictionary<uint, Item> itemDictionary = new Dictionary<uint, Item>();
         public static Dictionary<uint, Player> playerDictionary = new Dictionary<uint, Player>();
@@ -32,7 +40,17 @@ namespace mandc_Assign1
         string line;
         string[] tokens;
 
-        //default constructor for menu class
+        /***************************************************************
+        public Menu()
+
+        Use: Default constructor reads in all three input files and assigns
+        them to their corresponding Dictionary containers contained in a
+        seperate Global class for all classes to access.
+     
+        Parameters: none
+			
+        Returns: nothing
+        ***************************************************************/
         public Menu()
         {
             //read the item input file
@@ -104,7 +122,15 @@ namespace mandc_Assign1
             }
         }
 
-        //method to print the options
+        /***************************************************************
+        public void PrintMenu()
+
+        Use: Prints the testing menu
+     
+        Parameters: none
+			
+        Returns: nothing
+        ***************************************************************/
         public void PrintMenu()
         {
             Console.WriteLine("\nWelcome to World of ConflictCraft: Testing Environment. Please select an option from the list below: ");
@@ -120,6 +146,16 @@ namespace mandc_Assign1
             Console.WriteLine("\t10.) Quit");
         }
 
+        /***************************************************************
+        public GetOptions()
+
+        Use: Gets input from the user and uses a switch statement to decide
+        what to do with the input. 
+     
+        Parameters: none
+			
+        Returns: nothing
+        ***************************************************************/
         public void GetOptions()
         {  
             line = Console.ReadLine();
@@ -150,11 +186,11 @@ namespace mandc_Assign1
 
                         foreach (KeyValuePair<uint, Item> obj in Global.itemDictionary)
                         {
-                            Console.Write(obj.Value); //call to Items override ToString() method
+                            Console.Write(obj.Value); //calls Items override ToString() method
                         }
                         break;
 
-                    case "4": //print gear for a specific player 
+                    case "4": //Print gear for a specific player 
 
                         Console.Write("Enter the player name: ");
                         line = Console.ReadLine();
@@ -162,6 +198,7 @@ namespace mandc_Assign1
                         //LINQ query to find the associated player object
                         var findKey = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
+                        //Check that the player exists
                         if (!findKey.Any())
                             Console.WriteLine("'{0}' is not a valid player name.", line);
 
@@ -169,7 +206,7 @@ namespace mandc_Assign1
                         {
                             Global.playerDictionary.TryGetValue(key, out Player foundPlayer); //get the player object associated with the name
                             Console.Write(foundPlayer); //print the player's information                           
-                            GetGuild(foundPlayer); //including the guild their in
+                            GetGuild(foundPlayer); //including the guild they're in
 
                             for (int i = 0; i < foundPlayer.gear.Length; i++)
                             {
@@ -187,12 +224,13 @@ namespace mandc_Assign1
                         //LINQ query to find the associated player object
                         var findKey2 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
+                        //Check that the player exists
                         if (!findKey2.Any())
                             Console.WriteLine("'{0}' is not a valid player name.", line);
 
                         foreach (uint key in findKey2)
                         {
-                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer2);
+                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer2); //get the player object
 
                             foundPlayer2.GuildId = 0; //set the guildId to 0 which means "no guild" in this context
                             Console.WriteLine("{0} has left their Guild.", foundPlayer2.Name);
@@ -208,12 +246,13 @@ namespace mandc_Assign1
                         //LINQ query to find the associated Player object
                         var findKey3 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
+                        //check that the player exists
                         if (!findKey3.Any())
                             Console.WriteLine("'{0}' is not a valid player name.", line);
 
                         foreach (uint key in findKey3)
                         {
-                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer3);
+                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer3); //get the player object
 
                             Console.Write("Enter the Guild they will join: ");
                             line = Console.ReadLine();
@@ -221,6 +260,7 @@ namespace mandc_Assign1
                             //LINQ query to find the guild key associated with the name of the guild to join
                             var findGuildKey = from K in Global.guildDictionary where K.Value == line select K.Key;
 
+                            //check that the guild to join exists
                             if (!findGuildKey.Any())
                                 Console.WriteLine("'{0}' is not a valid guild name.", line);
 
@@ -241,6 +281,7 @@ namespace mandc_Assign1
                         //LINQ query to find the associated Player object
                         var findKey4 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
+                        //check that the player exists
                         if (!findKey4.Any())
                             Console.WriteLine("'{0}' is not a valid player name.", line);
 
@@ -254,12 +295,13 @@ namespace mandc_Assign1
                             //run query to find the corresponding Item object
                             var findItem = from K in Global.itemDictionary where K.Value.Name == line select K.Key;
 
+                            //check that the item to equip exists
                             if (!findItem.Any())
                                 Console.WriteLine("'{0}' is not a valid item name.", line);
 
                             foreach (uint key2 in findItem)
                             {
-                                foundPlayer4.EquipGear(key2);
+                                foundPlayer4.EquipGear(key2); //equip the item
                             }
                         }
                         break;
@@ -272,12 +314,13 @@ namespace mandc_Assign1
                         //LINQ query to find the associated guild key for the player name
                         var findKey5 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
+                        //check that the player exists
                         if (!findKey5.Any())
                             Console.WriteLine("'{0}' is not a valid player name.", line);
 
                         foreach (uint key in findKey5)
                         {
-                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer5);
+                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer5); //get the player object
 
                             Console.WriteLine("Enter the item slot number they will unequip: ");
                             Console.WriteLine("0 = Helmet");
@@ -294,7 +337,7 @@ namespace mandc_Assign1
                             Console.WriteLine("11 = Trinket");
 
                             line = Console.ReadLine();
-                            foundPlayer5.UnequipGear(Convert.ToInt32(line));
+                            foundPlayer5.UnequipGear(Convert.ToInt32(line)); //unequip the item 
                         }
                         break;
 
@@ -306,16 +349,17 @@ namespace mandc_Assign1
                         //LINQ query to find the associated guild key for the player name
                         var findKey6 = from K in Global.playerDictionary where K.Value.Name == line select K.Key;
 
+                        //check that the player exists
                         if (!findKey6.Any())
                             Console.WriteLine("'{0}' is not a valid player name.", line);
 
                         foreach (uint key in findKey6)
                         {
-                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer6);
+                            Global.playerDictionary.TryGetValue(key, out Player foundPlayer6);//get the player object
 
                             Console.Write("Enter the amount of experience to award: ");
                             line = Console.ReadLine();
-                            foundPlayer6.Exp += Convert.ToUInt32(line);
+                            foundPlayer6.Exp += Convert.ToUInt32(line); //add the experience 
                         }
                         break;
 
@@ -326,25 +370,26 @@ namespace mandc_Assign1
 
                         foreach(KeyValuePair<uint, Player> p in Global.playerDictionary)
                         {
-                            SortedPlayers.Add(p.Value);
+                            SortedPlayers.Add(p.Value); //add each player object to the sorted set
                         }
 
                         foreach (KeyValuePair<uint, Item> i in Global.itemDictionary)
                         {
-                            SortedItems.Add(i.Value);
+                            SortedItems.Add(i.Value); //add each item object to the sorted set
                         }
                         foreach(Item i in SortedItems)
                         {
-                            Console.Write(i);
+                            Console.Write(i); //uses the items ToString method
                         }
                         foreach(Player p in SortedPlayers)
                         {
-                            Console.Write(p);
+                            Console.Write(p); //uses the players ToString method
                             GetGuild(p);
                         }
                         break;
 
                  default:
+                        Console.WriteLine("Invalid choice, try again.");
                         break; 
                 } //end of switch statement
 
@@ -353,6 +398,17 @@ namespace mandc_Assign1
             }//end of while loop
         }
 
+        /***************************************************************
+        public void GetGuild(Player obj)
+
+        Use: Takes in a player object and finds the guild name associated
+        with that player object, then prints the guild they are in,
+        if they aren't in a guild it prints a new line.
+     
+        Parameters: 1. Player obj - the object of the Player to find the guild for
+			
+        Returns: nothing
+        ***************************************************************/
         public void GetGuild(Player obj)
         {
             //find the corresponding guild name
@@ -474,7 +530,15 @@ namespace mandc_Assign1
         }
 
 
-        //default constructor
+        /***************************************************************
+        public Item() //default constructor #1
+
+        Use: Default constructor sets all fields to zero or null.
+     
+        Parameters: none
+			
+        Returns: nothing
+        ***************************************************************/
         public Item()
         {
             id = 0;
@@ -487,7 +551,24 @@ namespace mandc_Assign1
             flavor = "";
         }
 
-        //default constructor #2
+        /***************************************************************
+        public Item(uint i, string n, uint ty, uint ilv, uint prim, uint stam,
+        uint req, string flav) //default constructor #2
+
+        Use: Default constructor initializes attributes for the Item class.
+     
+        Parameters: 
+        uint i - the item id
+        string n - the string name
+        uint ty - the item type 
+        uint ilv - the item level
+        uint prim - the item primary stat
+        uint stam - the item's stamina stat
+        uint req - the item's requirement
+        string flav - the item's flavor
+
+        Returns: nothing
+        ***************************************************************/
         public Item(uint i, string n, uint ty, uint ilv, uint prim, uint stam,
         uint req, string flav) 
         {
@@ -501,6 +582,17 @@ namespace mandc_Assign1
             flavor = flav;
         }
 
+        /***************************************************************
+        public int CompareTo(object obj)
+
+        Use: Compares two Item objects
+     
+        Parameters: 1. object obj - the object on the "right side of the operand"
+       
+
+        Returns: an integer when obj == null, otherwise recursively calls
+        for further comparison 
+        ***************************************************************/
         public int CompareTo(object obj)
         {
             if (obj == null) return 1;
@@ -513,7 +605,16 @@ namespace mandc_Assign1
                 throw new ArgumentException("[Item]:CompareTo argument is not an Item");
         }
 
-        //provide an override to ToString() method
+      
+        /***************************************************************
+        public override string ToString()
+
+        Use: Overrides the ToString() method for the Item class
+     
+        Parameters: none
+
+        Returns: nothing
+        ***************************************************************/
         public override string ToString()
         {
             return String.Format("({0}) {1} |{2}| --{3}--\n\t\"{4}\"\n", type, name, ilvl, requirement, flavor);
@@ -523,7 +624,7 @@ namespace mandc_Assign1
 
     public class Player : IComparable
     {
-        public bool equiped = false;
+        public bool equiped = false; //to determine which ring/trinket to equip next
         public bool equiped2 = false;
 
         public enum Race { Orc, Troll, Tauren, Forsaken };
@@ -538,8 +639,8 @@ namespace mandc_Assign1
         uint level;
         uint exp;
         uint guildID;
-        public uint[] gear = new uint[14];
-        List<uint> inventory = new List<uint>(); 
+        public uint[] gear;
+        List<uint> inventory;
 
         public uint Id //this is my public property
         {
@@ -595,14 +696,41 @@ namespace mandc_Assign1
             set { gear[index] = value; }
         }
 
+        /***************************************************************
+        public void LevelUp()
+
+        Use: Levels up the player by subtracting their exp from level*1000
+        and increasing their level
+     
+        Parameters: none
+
+        Returns: nothing
+        ***************************************************************/
         public void LevelUp()
         {
                 exp = exp - (level * 1000);
                 level++;
                 Console.WriteLine("Ding!");
             
-        } //function determines how a player levels up
+        }
 
+        /***************************************************************
+        public Player(uint id, string name, uint race, uint level,
+        uint exp, uint guildID, params uint[] gear) //default constructor #1
+
+        Use: Default constructor initializes attributes for the Player class
+     
+        Parameters: 
+        uint id - the item id
+        string name - the string name of the player
+        uint race - the player's race 
+        uint level- the player's level
+        uint exp - the player's exp
+        uint guildId - the -player's guild id
+        params uint[] gear - the gear the player is weilding
+
+        Returns: nothing
+        ***************************************************************/
         public Player(uint id, string name, uint race, uint level, uint exp, uint guildID, params uint[] gear)
         {
             this.id = id;
@@ -611,11 +739,22 @@ namespace mandc_Assign1
             this.level = level;
             this.exp = exp;
             this.guildID = guildID;
+            this.gear = new uint[14];
             for (int i = 0; i < gear.Length; i++)
                 this.gear[i] = gear[i];
+            this.inventory = new List<uint>();
 
         }
 
+        /***************************************************************
+        public Player() //default constructor #2
+
+        Use: Default constructor initializes attributes for the Player class
+     
+        Parameters: none
+
+        Returns: nothing
+        ***************************************************************/
         public Player()
         {
             this.id = 0;
@@ -624,13 +763,24 @@ namespace mandc_Assign1
             this.level = 0;
             this.exp = 0;
             this.guildID = 0;
-            
+            this.gear = new uint[14];
             for (uint i = 0; i < GEAR_SLOTS; i++) 
                 this.gear[i] = 0;
 
-            this.inventory = null;
+            this.inventory = new List<uint>();
         }
 
+        /***************************************************************
+        public int CompareTo(object obj)
+
+        Use: Compares Player objects so they can be sorted in Sorted Sets
+     
+        Parameters: 1. object obj - the object on the "right side" of the operand
+        to be compared with
+
+        Returns: an integer if obj is null, exception if it is not a Player object,
+        or recursively calls the CompareTo to for sorting.
+        ***************************************************************/
         public int CompareTo(object obj)
         {
             if (obj == null) return 1;
@@ -642,6 +792,15 @@ namespace mandc_Assign1
                 throw new ArgumentException("[Player]:CompareTo argument is not a Player");
         }
 
+        /***************************************************************
+        public void EquipGear(uint newGearID)
+
+        Use: Equips an item for a Player object 
+     
+        Parameters: 1. uint newGearID - the item id to equip
+
+        Returns: nothing
+        ***************************************************************/
         public void EquipGear(uint newGearID)
         {
             //LINQ to find the item object we will equip
@@ -651,7 +810,7 @@ namespace mandc_Assign1
             {
                 if (item.Requirement > Level)
                 {
-                    throw new System.ArgumentException("You do not have the required level to equip this item");
+                    throw new ItemLevelException("You do not have the required level to equip this item");
                 }
                 else
                 {
@@ -660,18 +819,19 @@ namespace mandc_Assign1
 
                     for (int i = 0; i < gear.Length; i++)//loop through each gear element
                     {
-                        if (gear[i] == 0) //don't waste time searching for an empty item 
-                            continue; 
-
-                        //Find the corresponding Item object                              
-                        Global.itemDictionary.TryGetValue(gear[i], out Item item2);
-
-                        //if item to equip is equal to the same item spot already equipped
-                        //e.g. Helmet == Helmet, or Ring == Ring, then we know this is the correct spot to put it
-                        if (item.Type == item2.Type)
+                        //Console.WriteLine(gear[i]);
+                        if (gear[i] != 0) //don't waste time searching for an empty item 
                         {
-                            save = i;
-                            itemsFound++; //keep track of how many times we encounter the item
+                            //Find the corresponding Item object                              
+                            Global.itemDictionary.TryGetValue(gear[i], out Item item2);
+
+                            //if item to equip is equal to the same item spot already equipped
+                            //e.g. Helmet == Helmet, or Ring == Ring, then we know this is the correct spot to put it
+                            if (item.Type == item2.Type)
+                            {
+                                save = i;
+                                itemsFound++; //keep track of how many times we encounter the item
+                            }
                         }
                     }
 
@@ -718,29 +878,70 @@ namespace mandc_Assign1
             }
         }
 
+        /***************************************************************
+        public void UnequipGear(int gearSlot)
+
+        Use: Unequips gear for a Player object
+     
+        Parameters: int gearSlot - the slot on the Player that will be unequipped
+
+        Returns: nothing
+        ***************************************************************/
         public void UnequipGear(int gearSlot)
         {
 
             if (gearSlot <= 11 && gearSlot >= 0)
             {
-
-                if (gear[gearSlot] != 0) //if the gear slot is not empty
+                if (inventory.Count >= MAX_INVENTORY_SIZE) //is the inventory full?
                 {
-                    if (inventory.Count >= MAX_INVENTORY_SIZE) //is the inventory full?
-                    {
-                        throw new System.ArgumentException("Inventory is full");
-                    }
-                    else
-                    {
-                        inventory.Add(gear[gearSlot]); //add the item to the inventory                      
-                        gear[gearSlot] = 0; //set the gear slot to empty
-                        Console.WriteLine("Successfully unequipped item.");
-                    }
+                    //throw new System.ArgumentException("Inventory is full");
+                    throw new InventoryFullException("Inventory is full");
                 }
                 else
                 {
-                    throw new System.ArgumentException("Nothing to remove");
-                }
+                    if (gear[gearSlot] == 0 && gearSlot != 10 && gearSlot != 11) //gear slot is empty and not a ring or trinket
+                    {
+                        Console.WriteLine("That spot is already empty");
+                    }
+                    else
+                    {
+                        if (gearSlot == 10 && gear[gearSlot] != 0) //if it is a ring and slot is not empty
+                        {
+                            //unequip
+                            inventory.Add(gear[gearSlot]); //add the item to the inventory                      
+                            gear[gearSlot] = 0; //set the gear slot to empty
+                            Console.WriteLine("Successfully unequipped item.");
+                        }
+                        else if (gearSlot == 10 && gear[gearSlot + 1] != 0)
+                        {
+                            //unequip
+                            inventory.Add(gear[gearSlot+1]); //add the item to the inventory                      
+                            gear[gearSlot+1] = 0; //set the gear slot to empty
+                            Console.WriteLine("Successfully unequipped item.");
+                        }
+                        else if (gearSlot == 11 && gear[gearSlot + 1] != 0)
+                        {
+                            //unequip
+                            inventory.Add(gear[gearSlot+1]); //add the item to the inventory                      
+                            gear[gearSlot+1] = 0; //set the gear slot to empty
+                            Console.WriteLine("Successfully unequipped item.");
+                        }
+                        else if (gearSlot == 11 && gear[gearSlot + 2] != 0)
+                        {
+                            //unequip
+                            inventory.Add(gear[gearSlot+2]); //add the item to the inventory                      
+                            gear[gearSlot+2] = 0; //set the gear slot to empty
+                            Console.WriteLine("Successfully unequipped item.");
+                        }
+                        else
+                        {
+                            inventory.Add(gear[gearSlot]); //add the item to the inventory                      
+                            gear[gearSlot] = 0; //set the gear slot to empty
+                            Console.WriteLine("Successfully unequipped item.");
+
+                        }
+                    }
+                }           
             }
             else
             {
@@ -748,6 +949,16 @@ namespace mandc_Assign1
             }
         }
 
+        /***************************************************************
+        public override string ToString()
+
+        Use: Overrides the ToString() method for the Player class to allow
+        efficient printing
+     
+        Parameters: none
+
+        Returns: nothing
+        ***************************************************************/
         public override string ToString()
         {
             return String.Format("Name: {0, -10} \t Race: {1, -8}  Level: {2} \t", name, race, level);
@@ -755,5 +966,29 @@ namespace mandc_Assign1
         }
     }
 
-    
+    //Exception class to handle when a player's Inventory is full 
+    public class InventoryFullException : Exception
+    {
+        public InventoryFullException()
+        { }
+
+        public InventoryFullException(string message) : base(message)
+        { }
+
+        public InventoryFullException(string message, Exception inner) : base(message, inner)
+        { }
+    }
+
+    //Exception clas to handle when an item's level is higher than the player's required level to equip it
+    public class ItemLevelException : Exception
+    {
+        public ItemLevelException()
+        { }
+
+        public ItemLevelException(string message) : base(message)
+        { }
+
+        public ItemLevelException(string message, Exception inner) : base(message, inner)
+        { }
+    }
 }
