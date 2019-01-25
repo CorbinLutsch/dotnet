@@ -209,9 +209,23 @@ namespace mandc_Assign1
                             GetGuild(foundPlayer); //including the guild they're in
 
                             for (int i = 0; i < foundPlayer.gear.Length; i++)
-                            {
+                            { 
                                 Global.itemDictionary.TryGetValue(foundPlayer.gear[i], out Item foundItem); //find each Item object that the player is wearing 
-                                Console.Write(foundItem); //print the item's information
+                                if (foundPlayer.gear[i] == 0) //if the player is not weilding anything
+                                {
+                                    if (i == 11) //rings are indexed as spot 10 in enum
+                                        Console.WriteLine("Ring: empty");
+                                    else if (i == 12)//trinkets are indexed as spot 11 in enum
+                                        Console.WriteLine("Trinket: empty");
+                                    else if (i == 13) //trinkets are indexed as spot 11 in enum
+                                        Console.WriteLine("Trinket: empty");
+                                    else//otherwise we have the right type cast for our enumerator 
+                                        Console.WriteLine("{0}: empty", (Item.ItemType)i);
+                                }
+                                else
+                                {
+                                    Console.Write(foundItem); //print the item's information
+                                }
                             }
                         }
                         break;
@@ -856,20 +870,35 @@ namespace mandc_Assign1
                         gear[save - 1] = item.Id; //put it in the lwoer index
                         equiped = true;
                     }
-                    else if (itemsFound == 1 && ((int)item.Type == 10 || (int)item.Type == 11)) //if only 1 ring or 1 trinket currently equipped
+                    else if (itemsFound == 1 && ((int)item.Type == 10))//if only 1 ring currently equipped
                     {
-                        if (save % 2 == 0) //then the upper index is occupied
+                        if (save == 10) //10 is occupied, put it in 1 above it
                         {
-                            gear[save - 1] = item.Id; //put in lower index
+                            gear[11] = item.Id; 
+                        }
+                        else //11 is occupied put it in 1 below it
+                        {
+                            gear[10] = item.Id; //put it in spot 11
+                        }
+                    }
+                    else if(itemsFound == 1 && (int)item.Type == 11)
+                    {
+                        if (save == 12) //if save is gear spot 12 and empty put in lower index
+                        {
+                            gear[13] = item.Id; //put in lower index
                         }
                         else //the lower index is occupied
                         {
-                            gear[save + 1] = item.Id; //put in upper index
+                            gear[12] = item.Id; //put in upper index
                         }
+                    }
+                    else if (itemsFound == 0 && ((int)item.Type == 11))
+                    {
+                        gear[(int)item.Type + 1] = item.Id; //put it in gear slot 12
                     }
                     else //the spot is open
                     {
-                        gear[(int)item.Type] = item.Id; //SO JUST PUT THE DAMN THING IN THERE SHEESH!
+                        gear[(int)item.Type] = item.Id; 
                     }
 
                     Console.WriteLine("{0} successfully equipped {1}!", Name, item.Name);
@@ -899,9 +928,18 @@ namespace mandc_Assign1
                 }
                 else
                 {
-                    if (gear[gearSlot] == 0 && gearSlot != 10 && gearSlot != 11) //gear slot is empty and not a ring or trinket
+                    if (gearSlot != 10 && gearSlot != 11) //gear is not a ring or trinket
                     {
-                        Console.WriteLine("That spot is already empty");
+                        if (gear[gearSlot] == 0)//if it's empty
+                        {
+                            Console.WriteLine("That spot is already empty");
+                        }
+                        else
+                        {
+                            inventory.Add(gear[gearSlot]); //add the item to the inventory                      
+                            gear[gearSlot] = 0; //set the gear slot to empty
+                            Console.WriteLine("Successfully unequipped item.");
+                        }
                     }
                     else
                     {
@@ -932,13 +970,10 @@ namespace mandc_Assign1
                             inventory.Add(gear[gearSlot+2]); //add the item to the inventory                      
                             gear[gearSlot+2] = 0; //set the gear slot to empty
                             Console.WriteLine("Successfully unequipped item.");
-                        }
+                        }                
                         else
                         {
-                            inventory.Add(gear[gearSlot]); //add the item to the inventory                      
-                            gear[gearSlot] = 0; //set the gear slot to empty
-                            Console.WriteLine("Successfully unequipped item.");
-
+                            Console.WriteLine("That spot is already empty.");
                         }
                     }
                 }           
