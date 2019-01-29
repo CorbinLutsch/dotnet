@@ -1,4 +1,4 @@
-﻿/* Corbin Lutsch & Mathew Lord
+﻿/* Corbin Lutsch & Matthew Lord
  *     Z1837389  & Z1848456
  *  CSCI - 473
  *  Due: 01/31/19
@@ -314,8 +314,15 @@ namespace mandc_Assign1
                                 Console.WriteLine("'{0}' is not a valid item name.", line);
 
                             foreach (uint key2 in findItem)
-                            {
-                                foundPlayer4.EquipGear(key2); //equip the item
+                            {                             
+                                try
+                                {
+                                    foundPlayer4.EquipGear(key2); //equip the item
+                                }
+                                catch (ItemLevelException e)
+                                {
+                                    Console.WriteLine(e);
+                                }         
                             }
                         }
                         break;
@@ -351,7 +358,16 @@ namespace mandc_Assign1
                             Console.WriteLine("11 = Trinket");
 
                             line = Console.ReadLine();
-                            foundPlayer5.UnequipGear(Convert.ToInt32(line)); //unequip the item 
+
+                            try
+                            {
+                                foundPlayer5.UnequipGear(Convert.ToInt32(line)); //unequip the item 
+                            }
+                            catch (InventoryFullException e)
+                            {
+                                Console.WriteLine(e);
+                            }
+                           
                         }
                         break;
 
@@ -638,8 +654,8 @@ namespace mandc_Assign1
 
     public class Player : IComparable
     {
-        public bool equiped = false; //to determine which ring/trinket to equip next
-        public bool equiped2 = false;
+        public bool equiped = true; //to determine which ring/trinket to equip next
+        public bool equiped2 = true;
 
         public enum Race { Orc, Troll, Tauren, Forsaken };
 
@@ -833,7 +849,6 @@ namespace mandc_Assign1
 
                     for (int i = 0; i < gear.Length; i++)//loop through each gear element
                     {
-                        //Console.WriteLine(gear[i]);
                         if (gear[i] != 0) //don't waste time searching for an empty item 
                         {
                             //Find the corresponding Item object                              
@@ -852,23 +867,23 @@ namespace mandc_Assign1
                     //if two of the same items are already equipped and it's a trinket
                     if (itemsFound == 2 && equiped && (int)item.Type == 11) //and we have already equipped once before
                     {
-                        gear[save] = item.Id; //put it in the higher index
+                        gear[save-1] = item.Id; //put it in the lower index
                         equiped = false;
                     }
                     else if (itemsFound == 2 && !equiped && (int)item.Type == 11)//two of the same items, trinket, havent equipped
                     {
-                        gear[save - 1] = item.Id; //put it in the lower index 
+                        gear[save] = item.Id; //put it in the upper index
                         equiped = true;
                     }
                     else if (itemsFound == 2 && equiped2 && (int)item.Type == 10) //same thing but with the ring location
                     {
-                        gear[save] = item.Id; //put it in the higher index
-                        equiped = false;
+                        gear[save-1] = item.Id; //put it in the lower
+                        equiped2 = false;
                     }
                     else if (itemsFound == 2 && !equiped2 && (int)item.Type == 10)
                     {
-                        gear[save - 1] = item.Id; //put it in the lwoer index
-                        equiped = true;
+                        gear[save] = item.Id; //put it in the higher index
+                        equiped2 = true;
                     }
                     else if (itemsFound == 1 && ((int)item.Type == 10))//if only 1 ring currently equipped
                     {
@@ -1004,26 +1019,21 @@ namespace mandc_Assign1
     //Exception class to handle when a player's Inventory is full 
     public class InventoryFullException : Exception
     {
-        public InventoryFullException()
+        public InventoryFullException() //default constructor #1
         { }
 
-        public InventoryFullException(string message) : base(message)
-        { }
+        public InventoryFullException(string message) : base(message) //default constructor #2 which passes the message to the
+        { } //Exception's default constructor class
 
-        public InventoryFullException(string message, Exception inner) : base(message, inner)
-        { }
     }
 
-    //Exception clas to handle when an item's level is higher than the player's required level to equip it
+    //Exception class to handle when an item's level is higher than the player's required level to equip it
     public class ItemLevelException : Exception
     {
-        public ItemLevelException()
+        public ItemLevelException() //default constructor #1
         { }
-
-        public ItemLevelException(string message) : base(message)
-        { }
-
-        public ItemLevelException(string message, Exception inner) : base(message, inner)
-        { }
+   
+        public ItemLevelException(string message) : base(message)//default constructor #2 which passes the message to the
+        { } //Exception's default constructor class
     }
 }
